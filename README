@@ -1,0 +1,8 @@
+obviously you have to make the Makefile match
+in debian/, you have to:
+    fill out control
+    create changelog (dch --create)
+    fill out missing bits of rules
+    add any directories to dirs
+    fill out readmes (optional)
+    fill out copyright (optional)

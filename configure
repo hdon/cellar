@@ -1,0 +1,51 @@
+#!/bin/sh
+
+# TODO - MAKE MODULAR
+
+#add a debug option
+DEBUG_OPTS=""
+
+if [ "$1" == "--debug" ]
+then
+    DEBUG_OPTS="-ggdb3 -gstabs+ -DDEBUG"
+fi
+
+# Reset existing configuration file
+rm -f configuration
+touch configuration
+
+# TODO: Add --debug= option
+CFLAGS=$CFLAGS" -Wall -I. "$DEBUG_OPTS
+
+# TODO: Make this better
+CFLAGS=$CFLAGS' -DOGLCONSOLE_USE_SDL -I../oglconsole'
+LDFLAGS=$LDFLAGS' ../oglconsole/oglconsole-sdl.o'
+
+# Mac OS X configuration
+if [ "`uname`" = Darwin ]
+then echo 'CFLAGS:=$(CFLAGS) '`sdl-config --cflags` $CFLAGS >> configuration
+echo 'LDFLAGS:=$(LDFLAGS) '`sdl-config --libs` $LDFLAGS -framework SDL_mixer -framework SDL_image >> configuration
+fi
+
+# Linux configuration
+if [ "`uname`" = Linux ]
+then echo 'CFLAGS:=$(CFLAGS) '`sdl-config --cflags` $CFLAGS >> configuration
+echo 'LDFLAGS:=$(LDFLAGS) '`sdl-config --libs` $LDFLAGS -lSDL_mixer -lSDL_image >> configuration
+fi
+
+# Windows configuration
+if uname | grep MINGW32
+then
+    if [ -d `pwd`/mingw-support ]
+    then
+        echo 'CFLAGS:=$(CFLAGS) '-I`pwd`/mingw-support/include -I`pwd`/mingw-support/include/SDL -Dmain=SDL_main -Drandom=rand -Dsrandom=srand $CFLAGS >> configuration
+        echo 'LDFLAGS:=$(LDFLAGS) '-L`pwd`/mingw-support/lib -lmingw32 -lSDLmain -lSDL -mwindows $LDFLAGS -lSDL_mixer -lSDL_image >> configuration
+    else
+    	echo 'Please check out mingw-support to build this project.'
+	echo '# cvs co mingw-support'
+	rm -f configuration
+        exit 1
+    fi
+fi
+
+echo 'USER='$USER >> configuration
