@@ -1,7 +1,7 @@
 #include "oglconsole.h"
 #include "game.h"
 #include "sound.h"
-#ifdef __MACH__
+#ifdef __APPLE__
 #  include <OpenGL/gl.h>
 #  include <OpenGL/glu.h>
 #else
