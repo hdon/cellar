@@ -18,7 +18,7 @@ namespace Game
             enum { MachineEmpty, MachineMetal,
                 MachineWire, MachineHotWire,    // spark adjascently
                 MachineSWire, MachineHotSWire,  // spark " and diagonally
-                MachineOWire, MachineHotOWire,  // odd wires. (only sparked oddly)
+                MachineOWire, MachineHotOWire,  // odd wires. (only sparked by an odd number of sparks)
                 MachineSpark, MachineSSpark,    // various sparks
                 MachineOSpark, KillerSpark,
                 MachineLifer,
