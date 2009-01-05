@@ -80,11 +80,10 @@ namespace Game
                     case MachineHotWire:
                         *Bell(x,y) = MachineWire;
                         break;
-                    case MachineWire:
-                        if (RangeAdjascent(x,y, LowSpark, HighSpark))
-                            *Bell(x,y) = MachineSpark;
-                        else *Bell(x,y) = MachineWire;
-                        break;
+                    case MachineWire: {
+                        int n = RangeAdjascent(x,y, LowSpark, HighSpark);
+                        *Bell(x,y) = (n == 1) || (n == 2) ? MachineSpark:MachineWire;
+                        } break;
 
                     case MachineLifer:
                         if (RangeAdjascent(x,y, LowSpark, HighSpark))
