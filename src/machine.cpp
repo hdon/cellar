@@ -81,7 +81,7 @@ namespace Game
                         *Bell(x,y) = MachineWire;
                         break;
                     case MachineWire: {
-                        int n = RangeNeighbor(x,y, LowSpark, HighSpark);
+                        int n = CountRangeNeighbor(x,y, LowSpark, HighSpark);
                         *Bell(x,y) = (n == 1) || (n == 2) ? MachineSpark:MachineWire;
                         } break;
 
