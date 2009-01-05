@@ -231,20 +231,101 @@ namespace Game
                         }
                         return true;
 
+                    case 's': {
+                        char *c = machineGrid->Gell(mx, my);
+                        switch (*c) {
+                            case MachineGrid::MachineWire:
+                            case MachineGrid::MachineHotWire:
+                                *c = MachineGrid::MachineSpark;
+                                break;
+                            case MachineGrid::MachineSpark:
+                                *c = MachineGrid::MachineWire;
+                                break;
+                            case MachineGrid::MachineSWire:
+                            case MachineGrid::MachineHotSWire:
+                                *c = MachineGrid::MachineSSpark;
+                                break;
+                            case MachineGrid::MachineSSpark:
+                                *c = MachineGrid::MachineSWire;
+                                break;
+                            case MachineGrid::MachineOWire:
+                            case MachineGrid::MachineHotOWire:
+                                *c = MachineGrid::MachineOSpark;
+                                break;
+                            case MachineGrid::MachineOSpark:
+                                *c = MachineGrid::MachineOWire;
+                                break;
+                            case MachineGrid::MachineKiller:
+                                *c = MachineGrid::KillerSpark;
+                                break;
+                            case MachineGrid::KillerSpark:
+                                *c = MachineGrid::MachineKiller;
+                                break;
+                        }
+                        return true;
+                    }
+
                     case 'a':
                         {
                             char *c = machineGrid->Gell(mx, my);
-                            OGLCONSOLE_Print("Incrementing %i,%i to %i\n", mx, my,
-                                    *c = (*c+1) % MachineGrid::MachineNumber);
+                            switch (*c) {
+                                case MachineGrid::MachineWire:
+                                case MachineGrid::MachineHotWire:
+                                    *c = MachineGrid::MachineSWire;
+                                    break;
+                                case MachineGrid::MachineSWire:
+                                case MachineGrid::MachineHotSWire:
+                                    *c = MachineGrid::MachineOWire;
+                                    break;
+                                case MachineGrid::MachineOWire:
+                                case MachineGrid::MachineHotOWire:
+                                    *c = MachineGrid::MachineLifer;
+                                    break;
+                                case MachineGrid::MachineLifer:
+                                    *c = MachineGrid::MachineKiller;
+                                    break;
+                                case MachineGrid::MachineKiller:
+                                case MachineGrid::KillerSpark:
+                                    *c = MachineGrid::MachineClocker;
+                                    break;
+                                default:
+                                case MachineGrid::MachineClocker:
+                                    *c = MachineGrid::MachineWire;
+                                    break;
+                            }
+                            OGLCONSOLE_Print("Incrementing %i,%i to %i\n", mx, my, *c);
                         }
                         return true;
 
                     case 'x':
                         {
                             char *c = machineGrid->Gell(mx, my);
-                            if (--*c < 0) *c += MachineGrid::MachineNumber;
-                            OGLCONSOLE_Print("Incrementing %i,%i to %i\n", mx, my,
-                                    *c);
+                            switch (*c) {
+                                case MachineGrid::MachineWire:
+                                case MachineGrid::MachineHotWire:
+                                    *c = MachineGrid::MachineClocker;
+                                    break;
+                                case MachineGrid::MachineOWire:
+                                case MachineGrid::MachineHotOWire:
+                                    *c = MachineGrid::MachineSWire;
+                                    break;
+                                case MachineGrid::MachineLifer:
+                                    *c = MachineGrid::MachineOWire;
+                                    break;
+                                case MachineGrid::MachineKiller:
+                                case MachineGrid::KillerSpark:
+                                    *c = MachineGrid::MachineLifer;
+                                    break;
+                                default:
+                                case MachineGrid::MachineClocker:
+                                    *c = MachineGrid::MachineKiller;
+                                    break;
+                                case MachineGrid::MachineSWire:
+                                case MachineGrid::MachineHotSWire:
+                                    *c = MachineGrid::MachineWire;
+                                    break;
+                            }
+                            OGLCONSOLE_Print("Incrementing %i,%i to %i\n", mx, my, *c);
                         }
                         return true;
 
