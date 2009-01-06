@@ -6,3 +6,6 @@ cellar : build/life.o build/grid.o build/sound.o build/game.o build/main.o build
 build/%.o : src/%.cpp
 	$(CXX) $(CFLAGS) -c $< -o $@
 
+clean ::
+	rm -fr build/*.o cellar
+
