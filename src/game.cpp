@@ -119,10 +119,22 @@ namespace Game
         glError(NULL, &err);
     }
 
-    void DefaultSetup()
+    void DefaultSetup(int w, int h)
     {
-        W= 127;
-        H= 217;
+        if (lifeGrid) {
+            LifeGrid *p = lifeGrid;
+            lifeGrid = NULL;
+            delete p;
+        }
+        if (machineGrid) {
+            MachineGrid *p = machineGrid;
+            machineGrid = NULL;
+            delete p;
+        }
+
+        W = w;
+        H = h;
+
         machineGrid = new MachineGrid(W,H);
         lifeGrid = new LifeGrid(W,H);
     }

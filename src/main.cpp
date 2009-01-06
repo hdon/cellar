@@ -19,6 +19,10 @@
 
 using namespace std;
 
+int ScreenWidth=640;
+int ScreenHeight=480;
+Uint32 video_flags = SDL_OPENGL|SDL_RESIZABLE|SDL_DOUBLEBUF;
+
 SDL_Event event;
 void conCB(OGLCONSOLE_Console console, char* cmd) {
     SDL_Surface * image;
@@ -34,12 +38,25 @@ void conCB(OGLCONSOLE_Console console, char* cmd) {
     SDL_PixelFormat *format = image->format;
     int x=0, y=0, npixels=0, i, bpp = format->BytesPerPixel, pitch = image->pitch;
     int w = image->w, h = image->h;
-
-    // Ignore parts of the image beyond the size of our game
     OGLCONSOLE_Print("Image file \"%s\" is %dx%d with %d bytes color\n", cmd, w, h, bpp);
-    if (w > Game::machineGrid->w) w = Game::machineGrid->w;
-    if (h > Game::machineGrid->h) h = Game::machineGrid->h;
 
+    // Ignore unreasonably large images
+    if ((w > 6000) || (h > 6000)) return;
+
+    // Resize display
+    ScreenWidth = w;
+    ScreenHeight = h;
+    if (SDL_SetVideoMode(ScreenWidth, ScreenHeight, 32, video_flags) == 0)
+    {
+        printf("SDL_SetVideoMode error: %s\n", SDL_GetError());
+        SDL_Quit();
+        return; // TODO exit?
+    }
+    glViewport(0, 0, ScreenWidth, ScreenHeight);
+
+    // Resize game using image dimensions
+    Game::DefaultSetup(w, h);
+    
     Uint32 pixel, pixels[64];
     do {
         // Extract pixel value
@@ -114,8 +131,6 @@ void conCB(OGLCONSOLE_Console console, char* cmd) {
     }*/
 };
 
-int ScreenWidth=640;
-int ScreenHeight=480;
 int main(int argc, char **argv)
 {
     bool fs = false;
@@ -153,7 +168,6 @@ int main(int argc, char **argv)
     SDL_JoystickEventState(SDL_ENABLE);
     JS=SDL_JoystickOpen(0);
 
-    Uint32 video_flags = SDL_OPENGL|SDL_RESIZABLE|SDL_DOUBLEBUF;
     if (fs) video_flags |= SDL_FULLSCREEN;
 
     if (SDL_SetVideoMode(ScreenWidth, ScreenHeight, 32, video_flags) == 0)
@@ -162,6 +176,7 @@ int main(int argc, char **argv)
         SDL_Quit();
         return 1;
     }
+
 
     SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
     SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 16);
