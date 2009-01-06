@@ -44,8 +44,8 @@ void conCB(OGLCONSOLE_Console console, char* cmd) {
     if ((w > 6000) || (h > 6000)) return;
 
     // Resize display
-    ScreenWidth = w;
-    ScreenHeight = h;
+    ScreenWidth = w * 4;
+    ScreenHeight = h * 4;
     if (SDL_SetVideoMode(ScreenWidth, ScreenHeight, 32, video_flags) == 0)
     {
         printf("SDL_SetVideoMode error: %s\n", SDL_GetError());
