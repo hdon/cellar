@@ -121,8 +121,8 @@ namespace Game
 
     void DefaultSetup()
     {
-        W= 64;
-        H= 48;
+        W= 127;
+        H= 217;
         machineGrid = new MachineGrid(W,H);
         lifeGrid = new LifeGrid(W,H);
     }
