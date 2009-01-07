@@ -257,19 +257,25 @@ namespace Game
                                 break;
 
                             case MachineGrid::MachineSWire:
-                            case MachineGrid::MachineHotSWire:
                                 *c = MachineGrid::MachineSSpark;
                                 break;
                             case MachineGrid::MachineSSpark:
+                                *c = MachineGrid::MachineHotSWire;
+                                break;
+                            case MachineGrid::MachineHotSWire:
                                 *c = MachineGrid::MachineSWire;
                                 break;
+
                             case MachineGrid::MachineOWire:
-                            case MachineGrid::MachineHotOWire:
                                 *c = MachineGrid::MachineOSpark;
                                 break;
                             case MachineGrid::MachineOSpark:
+                                *c = MachineGrid::MachineHotOWire;
+                                break;
+                            case MachineGrid::MachineHotOWire:
                                 *c = MachineGrid::MachineOWire;
                                 break;
+
                             case MachineGrid::MachineKiller:
                                 *c = MachineGrid::KillerSpark;
                                 break;
