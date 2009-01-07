@@ -29,12 +29,11 @@ namespace Game
     }
     void LifeGrid::Draw()
     {
+        glColor3ub(0,255,0);
         for (int x=0; x<w; x++)
             for (int y=0; y<h; y++)
             {
-                if (*Gell(x,y)) glColor3ub(0,255,0);
-                else glColor3ub(0,0,0);
-                DrawCell(x,y);
+                if (*Gell(x,y)) DrawCell(x,y);
             }
     }
 };

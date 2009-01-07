@@ -144,6 +144,7 @@ namespace Game
                 };
 
                 int c = *Gell(x,y);
+                if (c == 0) continue;
                 if (c >= MachineNumber) glColor3ub(random()%256,random()%256,random()%256);
                 else glColor3ub(colors[c][0],colors[c][1],colors[c][2]);
                 DrawCell(x,y);
