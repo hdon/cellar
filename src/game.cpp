@@ -247,12 +247,15 @@ namespace Game
                         char *c = machineGrid->Gell(mx, my);
                         switch (*c) {
                             case MachineGrid::MachineWire:
-                            case MachineGrid::MachineHotWire:
                                 *c = MachineGrid::MachineSpark;
                                 break;
                             case MachineGrid::MachineSpark:
+                                *c = MachineGrid::MachineHotWire;
+                                break;
+                            case MachineGrid::MachineHotWire:
                                 *c = MachineGrid::MachineWire;
                                 break;
+
                             case MachineGrid::MachineSWire:
                             case MachineGrid::MachineHotSWire:
                                 *c = MachineGrid::MachineSSpark;
