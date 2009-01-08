@@ -191,6 +191,27 @@ namespace Game
                     case 'n':
                         /* TODO: clear all grids */
                         return true;
+                    case 'm':
+                        if (e->key.keysym.mod & KMOD_CTRL) {
+                            if (machineGrid) machineGrid->Clear();
+                            return true;
+                        }
+                        return false;
+                    case 'l':
+                        if (e->key.keysym.mod & KMOD_CTRL) {
+                            if (lifeGrid) lifeGrid->Clear();
+                            return true;
+                        }
+                    //case 'l':  RUN THROUGH is deliberate here
+                    case SDLK_RIGHT:
+                        if (e->key.keysym.mod & KMOD_SHIFT)
+                            mX++;
+                        else {
+                            mX=++mx;
+                            mY=my;
+                        }
+                        return true;
+                    case 'j':
                     case SDLK_DOWN:
                         if (e->key.keysym.mod & KMOD_SHIFT)
                             mY++;
@@ -199,6 +220,7 @@ namespace Game
                             mX=mx;
                         }
                         return true;
+                    case 'k':
                     case SDLK_UP:
                         if (e->key.keysym.mod & KMOD_SHIFT)
                             mY--;
@@ -207,19 +229,12 @@ namespace Game
                             mX=mx;
                         }
                         return true;
+                    case 'h':
                     case SDLK_LEFT:
                         if (e->key.keysym.mod & KMOD_SHIFT)
                             mX--;
                         else {
                             mX=--mx;
-                            mY=my;
-                        }
-                        return true;
-                    case SDLK_RIGHT:
-                        if (e->key.keysym.mod & KMOD_SHIFT)
-                            mX++;
-                        else {
-                            mX=++mx;
                             mY=my;
                         }
                         return true;
@@ -356,14 +371,6 @@ namespace Game
                             }
                             OGLCONSOLE_Print("Incrementing %i,%i to %i\n", mx, my, *c);
                         }
-                        return true;
-
-                    case 'l':
-                        if (lifeGrid) lifeGrid->Clear();
-                        return true;
-
-                    case 'm':
-                        if (machineGrid) machineGrid->Clear();
                         return true;
 
                     case 'g':
