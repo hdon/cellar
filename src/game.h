@@ -9,7 +9,7 @@ namespace Game
     void Step();
     void Draw();
     void Quit();
-    void DefaultSetup(int w=64, int h=48);
+    void DefaultSetup(int w=64, int h=48, bool makeMachineGrid=true, bool makeLifeGrid=true);
     void DrawCell(int x, int y);
     void Mouse(int x, int y);
     bool MouseButton(int button, bool down);

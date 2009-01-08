@@ -55,7 +55,7 @@ void conCB(OGLCONSOLE_Console console, char* cmd) {
     glViewport(0, 0, ScreenWidth, ScreenHeight);
 
     // Resize game using image dimensions
-    Game::DefaultSetup(w, h);
+    Game::DefaultSetup(w, h, true, false);
     
     Uint32 pixel, pixels[64];
     static char naive_translation_table[4] = {

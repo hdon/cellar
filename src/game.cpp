@@ -40,11 +40,11 @@ namespace Game
 
     void RStep()
     {
-        lifeGrid->Step();
-        machineGrid->Step();
+        if (lifeGrid) lifeGrid->Step();
+        if (machineGrid) machineGrid->Step();
 
-        lifeGrid->PStep();
-        machineGrid->PStep();
+        if (lifeGrid) lifeGrid->PStep();
+        if (machineGrid) machineGrid->PStep();
     }
     void Step()
     {
@@ -88,8 +88,8 @@ namespace Game
 
         glBegin(GL_QUADS);
 
-        machineGrid->Draw();
-        lifeGrid->Draw();
+        if (machineGrid) machineGrid->Draw();
+        if (lifeGrid) lifeGrid->Draw();
 
         // draw mouse
         double intensity = fabs(sin(Frame*0.045)) * 0.2;
@@ -119,7 +119,7 @@ namespace Game
         glError(NULL, &err);
     }
 
-    void DefaultSetup(int w, int h)
+    void DefaultSetup(int w, int h, bool makeMachineGrid, bool makeLifeGrid)
     {
         if (lifeGrid) {
             LifeGrid *p = lifeGrid;
@@ -135,8 +135,12 @@ namespace Game
         W = w;
         H = h;
 
-        machineGrid = new MachineGrid(W,H);
-        lifeGrid = new LifeGrid(W,H);
+        if (makeMachineGrid) {
+            machineGrid = new MachineGrid(W,H);
+        }
+        if (makeLifeGrid) {
+            lifeGrid = new LifeGrid(W,H);
+        }
     }
 
     void Mouse(int x, int y)
@@ -221,29 +225,33 @@ namespace Game
                         return true;
 
                     case SDLK_BACKSPACE:
-                        machineGrid->DestroyAllSparks();
+                        if (machineGrid) machineGrid->DestroyAllSparks();
                         break;
                         
                     case 'y': //yank
-                        if (mclip) delete[] mclip;
-                        mclipw = mX-mx+1;
-                        mcliph = mY-my+1;
-                        OGLCONSOLE_Print("Yanked %ix%i\n", mclipw, mcliph);
-                        mclip = new char[mclipw*mcliph];
-                        for (int x=0; x<mclipw; x++)
+                        if (machineGrid) {
+                            if (mclip) delete[] mclip;
+                            mclipw = mX-mx+1;
+                            mcliph = mY-my+1;
+                            OGLCONSOLE_Print("Yanked %ix%i\n", mclipw, mcliph);
+                            mclip = new char[mclipw*mcliph];
+                            for (int x=0; x<mclipw; x++)
                             for (int y=0; y<mcliph; y++)
                                 mclip[x+y*mclipw] = *machineGrid->Gell(x+mx,y+my);
-                        return true;
-
-                    case 'p': //paste
-                        if (mclip) {
-                            for (int x=0; x<mclipw; x++)
-                                for (int y=0; y<mcliph; y++)
-                                    *machineGrid->Gell(x+mx,y+my) = mclip[x+y*mclipw];
                         }
                         return true;
 
-                    case 's': {
+                    case 'p': //paste
+                        if (machineGrid) {
+                            if (mclip) {
+                                for (int x=0; x<mclipw; x++)
+                                    for (int y=0; y<mcliph; y++)
+                                        *machineGrid->Gell(x+mx,y+my) = mclip[x+y*mclipw];
+                            }
+                        }
+                        return true;
+
+                    case 's': if (machineGrid) {
                         char *c = machineGrid->Gell(mx, my);
                         switch (*c) {
                             case MachineGrid::MachineWire:
@@ -287,7 +295,7 @@ namespace Game
                     }
 
                     case 'a':
-                        {
+                        if (machineGrid) {
                             char *c = machineGrid->Gell(mx, my);
                             switch (*c) {
                                 case MachineGrid::MachineWire:
@@ -319,7 +327,7 @@ namespace Game
                         return true;
 
                     case 'x':
-                        {
+                        if (machineGrid) {
                             char *c = machineGrid->Gell(mx, my);
                             switch (*c) {
                                 case MachineGrid::MachineWire:
@@ -351,16 +359,18 @@ namespace Game
                         return true;
 
                     case 'l':
-                        lifeGrid->Clear();
+                        if (lifeGrid) lifeGrid->Clear();
                         return true;
 
                     case 'm':
-                        machineGrid->Clear();
+                        if (machineGrid) machineGrid->Clear();
                         return true;
 
                     case 'g':
-                        OGLCONSOLE_Print("Cursor position: %i,%i Life:%i Machine:%i\n", mx, my,
-                                *lifeGrid->Gell(mx,my), *machineGrid->Gell(mx,my));
+                        OGLCONSOLE_Print("Cursor position: %i,%i", mx, my);
+                        if (lifeGrid) OGLCONSOLE_Print(" Life:%i", *lifeGrid->Gell(mx, my));
+                        if (machineGrid) OGLCONSOLE_Print(" Machine:%i\n", *machineGrid->Gell(mx,my));
+                        else OGLCONSOLE_Print("\n");
                         return true;
                 }
         }
