@@ -44,8 +44,8 @@ void conCB(OGLCONSOLE_Console console, char* cmd) {
     if ((w > 6000) || (h > 6000)) return;
 
     // Resize display
-    ScreenWidth = w * 4;
-    ScreenHeight = h * 4;
+    ScreenWidth = w;// * 4;
+    ScreenHeight = h;// * 4;
     if (SDL_SetVideoMode(ScreenWidth, ScreenHeight, 32, video_flags) == 0)
     {
         printf("SDL_SetVideoMode error: %s\n", SDL_GetError());
@@ -58,6 +58,12 @@ void conCB(OGLCONSOLE_Console console, char* cmd) {
     Game::DefaultSetup(w, h);
     
     Uint32 pixel, pixels[64];
+    static char naive_translation_table[4] = {
+        Game::MachineGrid::MachineEmpty,
+        Game::MachineGrid::MachineWire,
+        Game::MachineGrid::MachineSpark,
+        Game::MachineGrid::MachineHotWire,
+    };
     do {
         // Extract pixel value
         void* row = (void*) (((Uint8*)image->pixels) + pitch * y);
@@ -76,31 +82,40 @@ void conCB(OGLCONSOLE_Console console, char* cmd) {
             case 4:
             pixel = ((Uint32*)row)[x];
             break;
+            default:
+                printf("%s:%d error: cannot process image with %d bytes of color\n", __FILE__, __LINE__, bpp);
+                exit(0);
         }
-
-        // Copy temporary value into Wire World (Machine) grid
-        static char naive_translation_table[4] = {
-            Game::MachineGrid::MachineEmpty,
-            Game::MachineGrid::MachineWire,
-            Game::MachineGrid::MachineSpark,
-            Game::MachineGrid::MachineHotWire,
-        };
-        *Game::machineGrid->Gell(x, y) = naive_translation_table[pixel%4];
 
         // Search for pixel value in previously seen pixel values
         for (i=0; i<npixels; i++) {
             if (pixels[i] == pixel) break;
         }
         if ((i >= npixels) || (npixels == 0)) {
-            pixels[npixels++] = pixel;
+            // new pixel. add it to the list
+            pixels[npixels] = pixel;
+
+            // assign Wire World cell value
+            *Game::machineGrid->Gell(x, y) = naive_translation_table[npixels];
+
+            // increment pixel count
+            npixels++;
+        } else {
+            // old pixel value; look it up
+            int n=0;
+            while (pixels[n] != pixel) n++;
+
+            // assign Wire World cell value
+            *Game::machineGrid->Gell(x, y) = naive_translation_table[n];
         }
 
+        
         // Advance cursor
         if (++x >= w) {
             x = 0;
             if (++y >= h) break;
         }
-    } while (npixels<64);
+    } while (npixels<=4);
 
     SDL_FreeSurface(image);
     OGLCONSOLE_Print("found %d different colors in image file \"%s\"", npixels, cmd);
