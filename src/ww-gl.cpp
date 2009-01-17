@@ -20,6 +20,13 @@ inline void SDL_Fail(const char *filename, int line, const char *fn_name) {
     exit(-1);
 }
 
+
+#define GL_ERROR_CHECK() do{\
+    static int err = glGetError();\
+    if (err) printf("%s:%d OpenGL error %d: %s\n",\
+        __FILE__, __LINE__, err, gluErrorString(err));\
+}while(0);
+
 int main(int argc, char **argv) {
     if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO | SDL_INIT_JOYSTICK) < 0)
         FAIL("SDL_Init()");
@@ -52,7 +59,7 @@ int main(int argc, char **argv) {
 
     /* Enable the feature we need to store our cellular automata */
     glEnable(GL_STENCIL_TEST);
-    glClearColor(0.6,0.6,0.6,1);
+    glClearColor(0,0,0,1);
 
     /* WireWorld is commonly ... TODO explain */
     //int ww_history_phase = 1;
@@ -76,7 +83,7 @@ int main(int argc, char **argv) {
     glEnd();
 
     do {
-        /* Paint the color buffer grey60% */
+        /* Paint the color buffer black */
         glClear(GL_COLOR_BUFFER_BIT);
         
         /* Draw stencil buffer to color buffer four times with varied offsets */
@@ -93,7 +100,6 @@ int main(int argc, char **argv) {
             glViewport(x, y, width, height);
             /* Draw rectangle */
             glBegin(GL_QUADS);
-            glColor3d(1,0,0);
             glVertex2d(0,     0);
             glVertex2d(width, 0);
             glVertex2d(width, height);
@@ -103,7 +109,7 @@ int main(int argc, char **argv) {
         /* Reset viewport */
         glViewport(0, 0, width, height);
 
-        {int err=glGetError();if(err)printf("GL ERROR: %i\n",err);}
+        GL_ERROR_CHECK();
 
         /* Page flip! */
         SDL_GL_SwapBuffers();
