@@ -34,6 +34,8 @@ class Application:
         toolbox_view.append_column(gtk.TreeViewColumn('Preview',
             gtk.CellRendererPixbuf(), pixbuf = 1))
 
+        self.scale = 1
+
     def main(self):
         gtk.main()
 
