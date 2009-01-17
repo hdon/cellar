@@ -44,81 +44,60 @@ int main(int argc, char **argv) {
     glGetIntegerv(GL_STENCIL_BITS, &attr);
     printf("got %d stencil buffer bits (glGet)\n", attr);
 
+    int x1, y1, x2, y2;
+
     /* Acquire a pixel-for-pixel view matrix */
     glMatrixMode(GL_MODELVIEW);
     glOrtho(0, width, 0, height, -1, 1);
 
     /* Enable the feature we need to store our cellular automata */
     glEnable(GL_STENCIL_TEST);
+    glClearColor(0.6,0.6,0.6,1);
 
     /* WireWorld is commonly ... TODO explain */
-    int ww_history_phase = 1;
+    //int ww_history_phase = 1;
+
+    /* Draw four points on the stencil buffer */
+    /* Unconditinoally replace stencil buffer contents */
+    glStencilOp(GL_REPLACE, GL_REPLACE, GL_REPLACE);
+    /* Unconditionally defend color buffer contents */
+    glStencilFunc(GL_NEVER, 1, 255);
+    /* Rectangle shape in middle of screen */
+    x1 = width/4;
+    y1 = height/4;
+    x2 = width*3/4;
+    y2 = height*3/4;
+    /* Draw four points */
+    glBegin(GL_POINTS);
+    glVertex2d(x1, y1);
+    glVertex2d(x2, y1);
+    glVertex2d(x2, y2);
+    glVertex2d(x1, y2);
+    glEnd();
 
     do {
-        int x1, y1, x2, y2;
-
-        /* Paint the color buffer black */
-        glClear(GL_COLOR_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
-
-        /* Clear the stencil buffer to 0 */
-        //?
+        /* Paint the color buffer grey60% */
+        glClear(GL_COLOR_BUFFER_BIT);
         
-        /* Draw white rect encompassing entire display */
-        /* Unconditionally replace color buffer contents */
-        glStencilFunc(GL_ALWAYS, 0, 0);
-        /* Unconditionally defend stencil buffer contents */
+        /* Draw stencil buffer to color buffer four times with varied offsets */
+        /* Defend color buffer contents with stencil */
+        glStencilFunc(GL_EQUAL, 1, 255);
+        /* Unconditionally defend stencil buffer */
         glStencilOp(GL_KEEP, GL_KEEP, GL_KEEP);
-        /* Draw rectangle */
-        glBegin(GL_QUADS);
-        glColor3d(1,1,1);
-        glVertex2d(0,     0);
-        glVertex2d(width, 0);
-        glVertex2d(width, height);
-        glVertex2d(0,     height);
-        glEnd();
-
-        /* Draw a rectangle onto the upper-right corner of stencil buffer */
-        /* Unconditionally defend color buffer contents */
-        glStencilFunc(GL_NEVER, ww_history_phase, 3);
-        /* Unconditionally replace stencil buffer contents with value 1 */
-        glStencilOp(GL_REPLACE, GL_REPLACE, GL_REPLACE);
-        /* Rectangle shape in upper-right screen quadrant */
-        x1 = width/2;
-        y1 = height/2;
-        x2 = width;
-        y2 = height;
-        /* Draw rectangle */
-        glBegin(GL_QUADS);
-        glVertex2d(x1, y1);
-        glVertex2d(x2, y1);
-        glVertex2d(x2, y2);
-        glVertex2d(x1, y2);
-        glEnd();
-
-        /* Draw some dots to the color buffer */
+        /* Draw four rectangle */
         glColor3d(1,0,0);
-        /* Unconditinoally defend stencil buffer contents */
-        glStencilOp(GL_KEEP, GL_KEEP, GL_KEEP);
-        /* Defend color buffer contents with stencil test */
-        glStencilFunc(GL_EQUAL, ww_history_phase, ww_history_phase);
-        ww_history_phase ^= 3;
-        /* Rectangle shape in middle of screen */
-        x1 = width/4;
-        y1 = height/4;
-        x2 = width*3/4;
-        y2 = height*3/4;
-        /* Draw sixteen points */
         for (int x=-1; x<=1; x++)
         for (int y=-1; y<=1; y++) {
-            /* Adjust raster positions of dots */
             if (x == y || x == -y) continue;
+            /* Adjust raster positions */
             glViewport(x, y, width, height);
-            /* Plot points */
-            glBegin(GL_POINTS);
-            glVertex2d(x1, y1);
-            glVertex2d(x2, y1);
-            glVertex2d(x2, y2);
-            glVertex2d(x1, y2);
+            /* Draw rectangle */
+            glBegin(GL_QUADS);
+            glColor3d(1,0,0);
+            glVertex2d(0,     0);
+            glVertex2d(width, 0);
+            glVertex2d(width, height);
+            glVertex2d(0,     height);
             glEnd();
         }
         /* Reset viewport */
