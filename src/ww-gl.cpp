@@ -101,7 +101,7 @@ int main(int argc, char **argv) {
     glEnd();
 
     /* Enable texture mapping so that we can propagate Wire World sparks */
-    glEnable(GL_TEXTURE_2D);
+    //glEnable(GL_TEXTURE_2D);
     glColor3d(1,1,1);
 
     do {
