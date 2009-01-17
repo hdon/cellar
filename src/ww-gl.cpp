@@ -110,10 +110,10 @@ int main(int argc, char **argv) {
     glEnable(GL_TEXTURE_2D);
     glColor3d(1,1,1);
 
+    /* Paint the color buffer black */
+    glClear(GL_COLOR_BUFFER_BIT);
+    
     do {
-        /* Paint the color buffer black */
-        glClear(GL_COLOR_BUFFER_BIT);
-        
         /* Draw stencil buffer to color buffer four times with varied offsets */
         /* Defend color buffer contents with stencil */
         glStencilFunc(GL_EQUAL, 1, 255);
@@ -141,7 +141,7 @@ int main(int argc, char **argv) {
         GL_ERROR_CHECK();
 
         /* Feedback time */
-        glCopyTexImage2D(GL_TEXTURE_2D, 0, GL_LUMINANCE, 0, 0, twidth, theight, 0);
+        glCopyTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, 1, 1, twidth, theight);
 
         /* Draw texture to screen */
         glStencilFunc(GL_ALWAYS, 0, 0);
@@ -162,7 +162,7 @@ int main(int argc, char **argv) {
 
         /* Page flip! */
         SDL_GL_SwapBuffers();
-        puts("flip!");
+        //puts("flip!");
 
         /* Wait for next SDL event? */
         SDL_WaitEvent(&event);
