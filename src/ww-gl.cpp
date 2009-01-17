@@ -79,11 +79,12 @@ int main(int argc, char **argv) {
     /* We will need fast access to this texture */
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_PRIORITY, 1);
     /* Allocate texture memory - XXX arguments don't matter because last arg is NULL */
-    unsigned char *pixels = (unsigned char*)malloc(256*256);
-    for (int i=0; i<256*256; i++)
-        pixels[i] = i&0xff;
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, 256, 256, 0,
-            GL_GREEN/*XXX*/, GL_UNSIGNED_BYTE/*XXX*/, pixels);
+    int twidth = 256, theight = 256;
+    unsigned char *pixels = (unsigned char*)malloc(twidth*theight);
+    for (int i=0; i<twidth*theight; i++)
+        pixels[i] = (i%256/2) + (random()%256/2);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, twidth, theight, 0,
+            GL_LUMINANCE/*XXX*/, GL_UNSIGNED_BYTE/*XXX*/, pixels);
     GL_ERROR_CHECK();
 
     /* Draw four points on the stencil buffer */
@@ -146,10 +147,10 @@ int main(int argc, char **argv) {
         glEnable(GL_TEXTURE_2D);
         glBindTexture(GL_TEXTURE_2D, feedback_texture);
         /* Rectangle shape in middle of screen */
-        x1 = (width-256)/2;
-        y1 = (height-256)/2;
-        x2 = x1+256;
-        y2 = y1+256;
+        x1 = (width-twidth)/2;
+        y1 = (height-theight)/2;
+        x2 = x1+twidth;
+        y2 = y1+theight;
         /* Draw our rectangle */
         glBegin(GL_QUADS);
         glTexCoord2d( 0,  0);
