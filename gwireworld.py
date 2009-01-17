@@ -17,10 +17,17 @@ class Application:
         self.glade.signal_autoconnect({
             'on_window1_delete_event':      self.delete_event,
             'on_window1_destroy':           self.destroy,
+            'on_toggletoolbutton1_toggled': self.play_button_toggle,
         })
 
     def main(self):
         gtk.main()
+
+    def play_button_toggle(self, widget):
+        if widget.get_active():
+            print 'playing'
+        else:
+            print 'pausing'
 
 if __name__ == '__main__':
     try:
