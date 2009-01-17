@@ -69,9 +69,6 @@ int main(int argc, char **argv) {
     GLuint feedback_texture;
     glGenTextures(1, &feedback_texture);
     glBindTexture(GL_TEXTURE_2D, feedback_texture);
-    /* Allocate texture memory - XXX arguments don't matter because last arg is NULL */
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_INTENSITY, 1024, 1024, 0,
-            GL_RED/*XXX*/, GL_BYTE/*XXX*/, NULL);
     /* We CANNOT have ANY texture filtering!!! */
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
@@ -80,6 +77,9 @@ int main(int argc, char **argv) {
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP);
     /* We will need fast access to this texture */
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_PRIORITY, 1);
+    /* Allocate texture memory - XXX arguments don't matter because last arg is NULL */
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_INTENSITY, 1024, 1024, 0,
+            GL_RED/*XXX*/, GL_BYTE/*XXX*/, NULL);
     GL_ERROR_CHECK();
 
     /* Draw four points on the stencil buffer */
