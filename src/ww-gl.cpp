@@ -55,7 +55,7 @@ int main(int argc, char **argv) {
         
         /* Paint the color buffer white */
         glBegin(GL_QUADS);
-        glColor3d(1,1,1);
+        glColor3d(0,0,0);
         glVertex2d(0,     0);
         glVertex2d(width, 0);
         glVertex2d(width, height);
@@ -68,18 +68,20 @@ int main(int argc, char **argv) {
         int x2 = width*3/4;
         int y2 = height*3/4;
 
-        glBegin(GL_POINTS);
-        glColor3d(0,0,0);
+        glColor3d(0,1,1);
+        {int err=glGetError();if(err)printf("GL ERROR: %i\n",err);}
 
         for (int x=-1; x<=1; x++)
         for (int y=-1; y<=1; y++) {
             if (x == y || x == -y) continue;
+            glBegin(GL_POINTS);
             glVertex2d(x1+x, y1+y);
             glVertex2d(x2+x, y1+y);
             glVertex2d(x2+x, y2+y);
             glVertex2d(x1+x, y2+y);
+            glEnd();
         }
-        glEnd();
+        glRasterPos2i(0,0);
 
         SDL_GL_SwapBuffers();
 
