@@ -79,7 +79,7 @@ int main(int argc, char **argv) {
 
         /* Draw a rectangle onto the upper-right corner of stencil buffer */
         /* Unconditionally defend color buffer contents */
-        glStencilFunc(GL_NEVER, 1, -1);
+        glStencilFunc(GL_NEVER, ww_history_phase, 3);
         /* Unconditionally replace stencil buffer contents with value 1 */
         glStencilOp(GL_REPLACE, GL_REPLACE, GL_REPLACE);
         /* Rectangle shape in upper-right screen quadrant */
@@ -100,7 +100,7 @@ int main(int argc, char **argv) {
         /* Unconditinoally defend stencil buffer contents */
         glStencilOp(GL_KEEP, GL_KEEP, GL_KEEP);
         /* Defend color buffer contents with stencil test */
-        glStencilFunc(GL_NOTEQUAL, ww_history_phase, ww_history_phase);
+        glStencilFunc(GL_EQUAL, ww_history_phase, ww_history_phase);
         ww_history_phase ^= 3;
         /* Rectangle shape in middle of screen */
         x1 = width/4;
