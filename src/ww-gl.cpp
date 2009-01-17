@@ -91,14 +91,15 @@ int main(int argc, char **argv) {
     glDisable(GL_TEXTURE_2D);
     /* Unconditinoally replace stencil buffer contents */
     glStencilOp(GL_REPLACE, GL_REPLACE, GL_REPLACE);
-    /* Unconditionally defend color buffer contents */
-    glStencilFunc(GL_NEVER, 1, 255);
+    /* Unconditionally replace color buffer contents */
+    glStencilFunc(GL_ALWAYS, 1, 255);
     /* Rectangle shape in middle of screen */
     x1 = width/4;
     y1 = height/4;
     x2 = width*3/4;
     y2 = height*3/4;
     /* Draw four points */
+    glColor3d(1,1,1);
     glBegin(GL_POINTS);
     glVertex2d(x1, y1);
     glVertex2d(x2, y1);
@@ -108,57 +109,37 @@ int main(int argc, char **argv) {
 
     /* Enable texture mapping so that we can propagate Wire World sparks */
     glEnable(GL_TEXTURE_2D);
-    glColor3d(1,1,1);
+    glBindTexture(GL_TEXTURE_2D, feedback_texture);
+    /* */
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_ONE, GL_ONE);
 
-    /* Paint the color buffer black */
-    glClear(GL_COLOR_BUFFER_BIT);
-    
     do {
-        /* Draw stencil buffer to color buffer four times with varied offsets */
-        /* Defend color buffer contents with stencil */
-        glStencilFunc(GL_EQUAL, 1, 255);
-        /* Unconditionally defend stencil buffer */
+        /* Feedback time */
+        glCopyTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, 0, 0, twidth, theight);
+
+        /* Draw texture to screen */
+        glStencilFunc(GL_ALWAYS, 1, 1);
         glStencilOp(GL_KEEP, GL_KEEP, GL_KEEP);
-        /* */
-        glDisable(GL_TEXTURE_2D);
-        /* Draw four rectangle */
+        /* Draw four rectangles */
         for (int x=-1; x<=1; x++)
         for (int y=-1; y<=1; y++) {
             if (x == y || x == -y) continue;
             /* Adjust raster positions */
             glViewport(x, y, width, height);
-            /* Draw rectangle */
+            /* Draw our rectangle */
             glBegin(GL_QUADS);
-            glVertex2d(0,     0);
-            glVertex2d(width, 0);
-            glVertex2d(width, height);
-            glVertex2d(0,     height);
+            glTexCoord2d(0, 0);
+            glVertex2d  (0, 0);
+            glTexCoord2d(1, 0);
+            glVertex2d  (twidth, 0);
+            glTexCoord2d(1, 1);
+            glVertex2d  (twidth, theight);
+            glTexCoord2d(0, 1);
+            glVertex2d  (0, theight);
             glEnd();
         }
-        /* Reset viewport */
         glViewport(0, 0, width, height);
-
-        GL_ERROR_CHECK();
-
-        /* Feedback time */
-        glCopyTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, 1, 1, twidth, theight);
-
-        /* Draw texture to screen */
-        glStencilFunc(GL_ALWAYS, 0, 0);
-        glStencilOp(GL_KEEP, GL_KEEP, GL_KEEP);
-        glEnable(GL_TEXTURE_2D);
-        glBindTexture(GL_TEXTURE_2D, feedback_texture);
-        /* Draw our rectangle */
-        glBegin(GL_QUADS);
-        glTexCoord2d(0, 0);
-        glVertex2d  (0, 0);
-        glTexCoord2d(1, 0);
-        glVertex2d  (twidth, 0);
-        glTexCoord2d(1, 1);
-        glVertex2d  (twidth, theight);
-        glTexCoord2d(0, 1);
-        glVertex2d  (0, theight);
-        glEnd();
 
         /* Page flip! */
         SDL_GL_SwapBuffers();
