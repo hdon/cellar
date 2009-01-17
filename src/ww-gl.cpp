@@ -9,7 +9,7 @@
 #endif
 
 Uint32 video_flags = SDL_OPENGL;
-int width=640, height=480;
+int width=1024, height=1024;
 SDL_Surface *screen;
 SDL_Event event;
 
@@ -79,7 +79,7 @@ int main(int argc, char **argv) {
     /* We will need fast access to this texture */
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_PRIORITY, 1);
     /* Allocate texture memory - XXX arguments don't matter because last arg is NULL */
-    int twidth = 256, theight = 256;
+    int twidth = 1024, theight = 1024;
     unsigned char *pixels = (unsigned char*)malloc(twidth*theight);
     for (int i=0; i<twidth*theight; i++)
         pixels[i] = 0;
