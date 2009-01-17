@@ -46,43 +46,76 @@ int main(int argc, char **argv) {
     glOrtho(0, width, 0, height, -1, 1);
 
     /* Enable the feature we need to store our cellular automata */
-    //glEnable(GL_STENCIL_TEST);
-    //glStencilFunc(GL_EQUAL, 
+    glEnable(GL_STENCIL_TEST);
+    glStencilFunc(GL_EQUAL, 1, 1);
 
     do {
+        int x1, y1, x2, y2;
+
         /* Paint the color buffer black */
         glClear(GL_COLOR_BUFFER_BIT);
         
-        /* Paint the color buffer white */
+        /* Draw white rect encompassing entire display */
+        /* Unconditionally replace color buffer contents */
+        glStencilFunc(GL_ALWAYS, 0, 1);
+        /* Unconditionally defend stencil buffer contents */
+        glStencilOp(GL_KEEP, GL_KEEP, GL_KEEP);
+        /* Draw rectangle */
         glBegin(GL_QUADS);
-        glColor3d(0,0,0);
+        glColor3d(1,1,1);
         glVertex2d(0,     0);
         glVertex2d(width, 0);
         glVertex2d(width, height);
         glVertex2d(0,     height);
         glEnd();
 
-        /* Draw some white dots */
-        int x1 = width/4;
-        int y1 = height/4;
-        int x2 = width*3/4;
-        int y2 = height*3/4;
+        /* Draw a rectangle onto the upper-right corner of stencil buffer */
+        /* Unconditionally defend color buffer contents */
+        glStencilFunc(GL_NEVER, 0, 1);
+        /* Unconditionally replace stencil buffer contents with value 1 */
+        glStencilOp(GL_REPLACE, GL_REPLACE, GL_REPLACE);
+        /* Rectangle shape in upper-right screen quadrant */
+        x1 = width/2;
+        y1 = height/2;
+        x2 = width;
+        y2 = height;
+        /* Draw rectangle */
+        glBegin(GL_QUADS);
+        glVertex2d(x1, y1);
+        glVertex2d(x2, y1);
+        glVertex2d(x2, y2);
+        glVertex2d(x1, y2);
+        glEnd();
 
-        glColor3d(0,1,1);
-        {int err=glGetError();if(err)printf("GL ERROR: %i\n",err);}
-
+        /* Draw some dots to the color buffer */
+        glColor3d(0,0,0);
+        /* Unconditinoally defend stencil buffer contents */
+        glStencilOp(GL_KEEP, GL_KEEP, GL_KEEP);
+        /* Defend color buffer contents with stencil test */
+        glStencilFunc(GL_EQUAL, 1, 1);
+        /* Rectangle shape in middle of screen */
+        x1 = width/4;
+        y1 = height/4;
+        x2 = width*3/4;
+        y2 = height*3/4;
+        /* Draw sixteen points */
         for (int x=-1; x<=1; x++)
         for (int y=-1; y<=1; y++) {
+            /* Adjust raster positions of dots */
             if (x == y || x == -y) continue;
+            glViewport(x, y, width, height);
+            /* Plot points */
             glBegin(GL_POINTS);
-            glVertex2d(x1+x, y1+y);
-            glVertex2d(x2+x, y1+y);
-            glVertex2d(x2+x, y2+y);
-            glVertex2d(x1+x, y2+y);
+            glVertex2d(x1, y1);
+            glVertex2d(x2, y1);
+            glVertex2d(x2, y2);
+            glVertex2d(x1, y2);
             glEnd();
         }
-        glRasterPos2i(0,0);
+        /* Reset viewport */
+        glViewport(0, 0, width, height);
 
+        {int err=glGetError();if(err)printf("GL ERROR: %i\n",err);}
         SDL_GL_SwapBuffers();
 
         SDL_WaitEvent(&event);
