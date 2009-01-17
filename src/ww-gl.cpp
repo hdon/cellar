@@ -34,10 +34,10 @@ int main(int argc, char **argv) {
     SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER,        1);
     SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE,          0);
     SDL_GL_SetAttribute(SDL_GL_STENCIL_SIZE,        2);
-    SDL_GL_SetAttribute(SDL_GL_ACCUM_RED_SIZE,      0);
-    SDL_GL_SetAttribute(SDL_GL_ACCUM_GREEN_SIZE,    0);
-    SDL_GL_SetAttribute(SDL_GL_ACCUM_BLUE_SIZE,     0);
-    SDL_GL_SetAttribute(SDL_GL_ACCUM_ALPHA_SIZE,    0);
+    SDL_GL_SetAttribute(SDL_GL_RED_SIZE,      1);
+    SDL_GL_SetAttribute(SDL_GL_GREEN_SIZE,    1);
+    SDL_GL_SetAttribute(SDL_GL_BLUE_SIZE,     1);
+    SDL_GL_SetAttribute(SDL_GL_ALPHA_SIZE,    1);
 
     if (SDL_SetVideoMode(width, height, 0, video_flags) == 0)
         FAIL("SDL_SetVideoMode()");
