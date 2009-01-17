@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 import os, sys, gtk, gtk.glade, gobject
+from gtk import gdk
 
 class Application:
     def destroy(self, widget, data=None):
@@ -19,6 +20,19 @@ class Application:
             'on_window1_destroy':           self.destroy,
             'on_toggletoolbutton1_toggled': self.play_button_toggle,
         })
+
+        # A "toolbox" gives users a palette of common CA patterns
+        # A 'Store' abstracts our toolbox data from its view
+        self.toolbox = gtk.ListStore(gobject.TYPE_STRING, gdk.Pixbuf)
+        # A 'TreeView' provides the view of our toolbox
+        toolbox_view = self.glade.get_widget('treeview1')
+        # Associate our toolbox model and view
+        toolbox_view.set_model(self.toolbox)
+        # Teach our toolbox view how to use its model
+        toolbox_view.append_column(gtk.TreeViewColumn('Name',
+            gtk.CellRendererText(), text = 0))
+        toolbox_view.append_column(gtk.TreeViewColumn('Preview',
+            gtk.CellRendererPixbuf(), pixbuf = 1))
 
     def main(self):
         gtk.main()
