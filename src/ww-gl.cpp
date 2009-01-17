@@ -67,6 +67,7 @@ int main(int argc, char **argv) {
     /* Create a texture map which we'll use for a feedback loop with the
      * color and stencil buffers */
     GLuint feedback_texture;
+    glEnable(GL_TEXTURE_2D); /* XXX does this do anything? */
     glGenTextures(1, &feedback_texture);
     glBindTexture(GL_TEXTURE_2D, feedback_texture);
     /* We CANNOT have ANY texture filtering!!! */
@@ -78,10 +79,15 @@ int main(int argc, char **argv) {
     /* We will need fast access to this texture */
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_PRIORITY, 1);
     /* Allocate texture memory - XXX arguments don't matter because last arg is NULL */
-    glTexImage2D(GL_TEXTURE_2D, 0, 1, 1024, 1024, 0, GL_RED/*XXX*/, GL_BYTE/*XXX*/, NULL);
+    unsigned char *pixels = (unsigned char*)malloc(256*256);
+    for (int i=0; i<256*256; i++)
+        pixels[i] = i&0xff;
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, 256, 256, 0,
+            GL_GREEN/*XXX*/, GL_UNSIGNED_BYTE/*XXX*/, pixels);
     GL_ERROR_CHECK();
 
     /* Draw four points on the stencil buffer */
+    glDisable(GL_TEXTURE_2D);
     /* Unconditinoally replace stencil buffer contents */
     glStencilOp(GL_REPLACE, GL_REPLACE, GL_REPLACE);
     /* Unconditionally defend color buffer contents */
@@ -100,7 +106,7 @@ int main(int argc, char **argv) {
     glEnd();
 
     /* Enable texture mapping so that we can propagate Wire World sparks */
-    //glEnable(GL_TEXTURE_2D);
+    glEnable(GL_TEXTURE_2D);
     glColor3d(1,1,1);
 
     do {
@@ -112,6 +118,8 @@ int main(int argc, char **argv) {
         glStencilFunc(GL_EQUAL, 1, 255);
         /* Unconditionally defend stencil buffer */
         glStencilOp(GL_KEEP, GL_KEEP, GL_KEEP);
+        /* */
+        glDisable(GL_TEXTURE_2D);
         /* Draw four rectangle */
         for (int x=-1; x<=1; x++)
         for (int y=-1; y<=1; y++) {
@@ -130,6 +138,29 @@ int main(int argc, char **argv) {
         glViewport(0, 0, width, height);
 
         GL_ERROR_CHECK();
+
+        /* test stuff */
+
+        glStencilFunc(GL_ALWAYS, 0, 0);
+        glStencilOp(GL_KEEP, GL_KEEP, GL_KEEP);
+        glEnable(GL_TEXTURE_2D);
+        glBindTexture(GL_TEXTURE_2D, feedback_texture);
+        /* Rectangle shape in middle of screen */
+        x1 = (width-256)/2;
+        y1 = (height-256)/2;
+        x2 = x1+256;
+        y2 = y1+256;
+        /* Draw our rectangle */
+        glBegin(GL_QUADS);
+        glTexCoord2d( 0,  0);
+        glVertex2d  (x1, y1);
+        glTexCoord2d( 1,  0);
+        glVertex2d  (x2, y1);
+        glTexCoord2d( 1,  1);
+        glVertex2d  (x2, y2);
+        glTexCoord2d( 0,  1);
+        glVertex2d  (x1, y2);
+        glEnd();
 
         /* Page flip! */
         SDL_GL_SwapBuffers();
