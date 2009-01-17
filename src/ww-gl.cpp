@@ -57,12 +57,30 @@ int main(int argc, char **argv) {
     glMatrixMode(GL_MODELVIEW);
     glOrtho(0, width, 0, height, -1, 1);
 
-    /* Enable the feature we need to store our cellular automata */
+    /* Enable the stencil buffer */
     glEnable(GL_STENCIL_TEST);
     glClearColor(0,0,0,1);
 
     /* WireWorld is commonly ... TODO explain */
     //int ww_history_phase = 1;
+
+    /* Create a texture map which we'll use for a feedback loop with the
+     * color and stencil buffers */
+    GLuint feedback_texture;
+    glGenTextures(1, &feedback_texture);
+    glBindTexture(GL_TEXTURE_2D, feedback_texture);
+    /* Allocate texture memory - XXX arguments don't matter because last arg is NULL */
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_INTENSITY, 1024, 1024, 0,
+            GL_RED/*XXX*/, GL_BYTE/*XXX*/, NULL);
+    /* We CANNOT have ANY texture filtering!!! */
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+    /* I guess we should disable texture wrapping */
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP);
+    /* We will need fast access to this texture */
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_PRIORITY, 1);
+    GL_ERROR_CHECK();
 
     /* Draw four points on the stencil buffer */
     /* Unconditinoally replace stencil buffer contents */
@@ -82,6 +100,10 @@ int main(int argc, char **argv) {
     glVertex2d(x1, y2);
     glEnd();
 
+    /* Enable texture mapping so that we can propagate Wire World sparks */
+    glEnable(GL_TEXTURE_2D);
+    glColor3d(1,1,1);
+
     do {
         /* Paint the color buffer black */
         glClear(GL_COLOR_BUFFER_BIT);
@@ -92,7 +114,6 @@ int main(int argc, char **argv) {
         /* Unconditionally defend stencil buffer */
         glStencilOp(GL_KEEP, GL_KEEP, GL_KEEP);
         /* Draw four rectangle */
-        glColor3d(1,0,0);
         for (int x=-1; x<=1; x++)
         for (int y=-1; y<=1; y++) {
             if (x == y || x == -y) continue;
