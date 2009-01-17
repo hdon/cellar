@@ -78,8 +78,7 @@ int main(int argc, char **argv) {
     /* We will need fast access to this texture */
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_PRIORITY, 1);
     /* Allocate texture memory - XXX arguments don't matter because last arg is NULL */
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_INTENSITY, 1024, 1024, 0,
-            GL_RED/*XXX*/, GL_BYTE/*XXX*/, NULL);
+    glTexImage2D(GL_TEXTURE_2D, 0, 1, 1024, 1024, 0, GL_RED/*XXX*/, GL_BYTE/*XXX*/, NULL);
     GL_ERROR_CHECK();
 
     /* Draw four points on the stencil buffer */
