@@ -37,9 +37,12 @@ int main(int argc, char **argv) {
 
     int attr;
     SDL_GL_GetAttribute(SDL_GL_STENCIL_SIZE, &attr);
-    printf("got %d stencil buffer bits\n", attr);
+    printf("got %d stencil buffer bits (SDL_GL_GetAttr)\n", attr);
     SDL_GL_GetAttribute(SDL_GL_DOUBLEBUFFER, &attr);
-    printf("double buffering %sabled\n", (attr?"en":"dis"));
+    printf("double buffering %sabled (SDL_GL_GetAttr)\n", (attr?"en":"dis"));
+
+    glGetIntegerv(GL_STENCIL_BITS, &attr);
+    printf("got %d stencil buffer bits (glGet)\n", attr);
 
     /* Acquire a pixel-for-pixel view matrix */
     glMatrixMode(GL_MODELVIEW);
@@ -47,17 +50,22 @@ int main(int argc, char **argv) {
 
     /* Enable the feature we need to store our cellular automata */
     glEnable(GL_STENCIL_TEST);
-    glStencilFunc(GL_EQUAL, 1, 1);
+
+    /* WireWorld is commonly ... TODO explain */
+    int ww_history_phase = 1;
 
     do {
         int x1, y1, x2, y2;
 
         /* Paint the color buffer black */
-        glClear(GL_COLOR_BUFFER_BIT);
+        glClear(GL_COLOR_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
+
+        /* Clear the stencil buffer to 0 */
+        //?
         
         /* Draw white rect encompassing entire display */
         /* Unconditionally replace color buffer contents */
-        glStencilFunc(GL_ALWAYS, 0, 1);
+        glStencilFunc(GL_ALWAYS, 0, 0);
         /* Unconditionally defend stencil buffer contents */
         glStencilOp(GL_KEEP, GL_KEEP, GL_KEEP);
         /* Draw rectangle */
@@ -71,7 +79,7 @@ int main(int argc, char **argv) {
 
         /* Draw a rectangle onto the upper-right corner of stencil buffer */
         /* Unconditionally defend color buffer contents */
-        glStencilFunc(GL_NEVER, 0, 1);
+        glStencilFunc(GL_NEVER, 1, -1);
         /* Unconditionally replace stencil buffer contents with value 1 */
         glStencilOp(GL_REPLACE, GL_REPLACE, GL_REPLACE);
         /* Rectangle shape in upper-right screen quadrant */
@@ -88,11 +96,12 @@ int main(int argc, char **argv) {
         glEnd();
 
         /* Draw some dots to the color buffer */
-        glColor3d(0,0,0);
+        glColor3d(1,0,0);
         /* Unconditinoally defend stencil buffer contents */
         glStencilOp(GL_KEEP, GL_KEEP, GL_KEEP);
         /* Defend color buffer contents with stencil test */
-        glStencilFunc(GL_EQUAL, 1, 1);
+        glStencilFunc(GL_NOTEQUAL, ww_history_phase, ww_history_phase);
+        ww_history_phase ^= 3;
         /* Rectangle shape in middle of screen */
         x1 = width/4;
         y1 = height/4;
@@ -116,8 +125,12 @@ int main(int argc, char **argv) {
         glViewport(0, 0, width, height);
 
         {int err=glGetError();if(err)printf("GL ERROR: %i\n",err);}
-        SDL_GL_SwapBuffers();
 
+        /* Page flip! */
+        SDL_GL_SwapBuffers();
+        puts("flip!");
+
+        /* Wait for next SDL event? */
         SDL_WaitEvent(&event);
     } while (event.type != SDL_QUIT);
 
