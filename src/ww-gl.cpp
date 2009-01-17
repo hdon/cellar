@@ -82,8 +82,8 @@ int main(int argc, char **argv) {
     int twidth = 256, theight = 256;
     unsigned char *pixels = (unsigned char*)malloc(twidth*theight);
     for (int i=0; i<twidth*theight; i++)
-        pixels[i] = (i%256/2) + (random()%256/2);
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, twidth, theight, 0,
+        pixels[i] = 0;
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_LUMINANCE, twidth, theight, 0,
             GL_LUMINANCE/*XXX*/, GL_UNSIGNED_BYTE/*XXX*/, pixels);
     GL_ERROR_CHECK();
 
@@ -140,27 +140,24 @@ int main(int argc, char **argv) {
 
         GL_ERROR_CHECK();
 
-        /* test stuff */
+        /* Feedback time */
+        glCopyTexImage2D(GL_TEXTURE_2D, 0, GL_LUMINANCE, 0, 0, twidth, theight, 0);
 
+        /* Draw texture to screen */
         glStencilFunc(GL_ALWAYS, 0, 0);
         glStencilOp(GL_KEEP, GL_KEEP, GL_KEEP);
         glEnable(GL_TEXTURE_2D);
         glBindTexture(GL_TEXTURE_2D, feedback_texture);
-        /* Rectangle shape in middle of screen */
-        x1 = (width-twidth)/2;
-        y1 = (height-theight)/2;
-        x2 = x1+twidth;
-        y2 = y1+theight;
         /* Draw our rectangle */
         glBegin(GL_QUADS);
-        glTexCoord2d( 0,  0);
-        glVertex2d  (x1, y1);
-        glTexCoord2d( 1,  0);
-        glVertex2d  (x2, y1);
-        glTexCoord2d( 1,  1);
-        glVertex2d  (x2, y2);
-        glTexCoord2d( 0,  1);
-        glVertex2d  (x1, y2);
+        glTexCoord2d(0, 0);
+        glVertex2d  (0, 0);
+        glTexCoord2d(1, 0);
+        glVertex2d  (twidth, 0);
+        glTexCoord2d(1, 1);
+        glVertex2d  (twidth, theight);
+        glTexCoord2d(0, 1);
+        glVertex2d  (0, theight);
         glEnd();
 
         /* Page flip! */
