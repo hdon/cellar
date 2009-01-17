@@ -162,7 +162,6 @@ int main(int argc, char **argv) {
 
         /* Page flip! */
         SDL_GL_SwapBuffers();
-        //puts("flip!");
 
         /* Wait for next SDL event? */
         SDL_WaitEvent(&event);
