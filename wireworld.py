@@ -37,21 +37,25 @@ class WireWorld:
         self.front_buffer = matrix(w,h)
         self.back_buffer = matrix(w,h)
 
-    def get_at(x,y): return self.front_buffer[x][y]
+    def get_at(self,x,y): return self.front_buffer[y][x]
+    def spark_at(self,x,y): return self.front_buffer[y][x] == CELL_SPARKHEAD
 
     def step(self):
         w, h = self.w, self.h
         bounds = in_bounds(w, h)
         for x, y in plane(w, h):
-            v = self.front_buffer[x][y]
+            v = self.front_buffer[y][x]
 
             if   v == CELL_INSULATOR: pass
             elif v == CELL_CONDUCTOR:
-                v = sum((self.get_at(x,y) for x,y in
+                v = sum((self.spark_at(x,y) for x,y in
                       filter(bounds, perimeter(x-1,y-1,x+1,y+1))))
-                if 3 > v and v > 0: v = CELL_ELECTRONHEAD
+                if 3 > v and v > 0: v = CELL_SPARKHEAD
                 else: v = CELL_CONDUCTOR
             else: v -= 1
 
-            self.back_buffer[x][y] = v
+            self.back_buffer[y][x] = v
+
+        self.back_buffer, self.front_buffer = \
+        self.front_buffer, self.back_buffer
 
